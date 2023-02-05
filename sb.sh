@@ -50,7 +50,7 @@ git_fetch_and_reset () {
     git fetch --quiet >/dev/null
     git clean --quiet -df >/dev/null
     git reset --quiet --hard "@{u}" >/dev/null
-    git checkout --quiet "${SHITBOX_BRANCH:-main}" >/dev/null
+    git checkout --quiet "${SHITBOX_BRANCH:-master}" >/dev/null
     git clean --quiet -df >/dev/null
     git reset --quiet --hard "@{u}" >/dev/null
     git submodule update --init --recursive
@@ -66,7 +66,7 @@ git_fetch_and_reset_sb () {
     git fetch --quiet >/dev/null
     git clean --quiet -df >/dev/null
     git reset --quiet --hard "@{u}" >/dev/null
-    git checkout --quiet main >/dev/null
+    git checkout --quiet master >/dev/null
     git clean --quiet -df >/dev/null
     git reset --quiet --hard "@{u}" >/dev/null
     git submodule update --init --recursive
@@ -89,15 +89,15 @@ run_playbook_sb () {
 
 }
 
-run_playbook_sandbox () {
+run_playbook_shitbox () {
 
     local arguments=$*
 
-    cd "${SANDBOX_REPO_PATH}" || exit
+    cd "${SHITBOX_REPO_PATH}" || exit
 
     # shellcheck disable=SC2086
     "${ANSIBLE_PLAYBOOK_BINARY_PATH}" \
-        "${SANDBOX_PLAYBOOK_PATH}" \
+        "${SHITBOX_PLAYBOOK_PATH}" \
         --become \
         ${arguments}
 
@@ -158,15 +158,15 @@ install () {
     local tags=()
     readarray -t tags < <(printf '%s\n' "${tags_tmp[@]}" | awk '!x[$0]++')
 
-    # Build SB/Sandbox/Shitbox-mod tag arrays
+    # Build SB/Shitbox/Shitbox-mod tag arrays
     local tags_sb
-    local tags_sandbox
+    local tags_shitbox
     local tags_shitboxmod
 
     for i in "${!tags[@]}"
     do
-        if [[ ${tags[i]} == sandbox-* ]]; then
-            tags_sandbox="${tags_sandbox}${tags_sandbox:+,}${tags[i]##sandbox-}"
+        if [[ ${tags[i]} == shitbox-* ]]; then
+            tags_shitbox="${tags_shitbox}${tags_shitbox:+,}${tags[i]##shitbox-}"
 
         elif [[ ${tags[i]} == mod-* ]]; then
             tags_shitboxmod="${tags_shitboxmod}${tags_shitboxmod:+,}${tags[i]##mod-}"
@@ -196,22 +196,22 @@ install () {
 
     fi
 
-    # Sandbox Ansible Playbook
-    if [[ -n "$tags_sandbox" ]]; then
+    # Shitbox Ansible Playbook
+    if [[ -n "$tags_shitbox" ]]; then
 
         # Build arguments
-        local arguments_sandbox="--tags $tags_sandbox"
+        local arguments_shitbox="--tags $tags_shitbox"
 
         if [[ -n "$extra_arg" ]]; then
-            arguments_sandbox="${arguments_sandbox} ${extra_arg}"
+            arguments_shitbox="${arguments_shitbox} ${extra_arg}"
         fi
 
         # Run playbook
         echo "========================="
         echo ""
-        echo "Running Sandbox Tags: ${tags_sandbox//,/,  }"
+        echo "Running Shitbox Tags: ${tags_shitbox//,/,  }"
         echo ""
-        run_playbook_sandbox "$arguments_sandbox"
+        run_playbook_shitbox "$arguments_shitbox"
         echo ""
     fi
 
@@ -268,19 +268,19 @@ update () {
 
 }
 
-sandbox-update () {
+shitbox-update () {
 
-    if [[ -d "${SANDBOX_REPO_PATH}" ]]
+    if [[ -d "${SHITBOX_REPO_PATH}" ]]
     then
-        echo -e "Updating Sandbox...\n"
+        echo -e "Updating Shitbox...\n"
 
-        cd "${SANDBOX_REPO_PATH}" || exit
+        cd "${SHITBOX_REPO_PATH}" || exit
 
-        git_fetch_and_reset_sandbox
+        git_fetch_and_reset_shitbox
 
-        sed -i 's/\/usr\/bin\/python3/\/srv\/ansible\/venv\/bin\/python3/g' /opt/sandbox/ansible.cfg
+        sed -i 's/\/usr\/bin\/python3/\/srv\/ansible\/venv\/bin\/python3/g' /opt/shitbox/ansible.cfg
 
-        run_playbook_sandbox "--tags settings" && echo -e '\n'
+        run_playbook_shitbox "--tags settings" && echo -e '\n'
 
         echo -e "Update Completed."
     fi
@@ -321,15 +321,15 @@ sb-list ()  {
 
 }
 
-sandbox-list () {
+shitbox-list () {
 
-    if [[ -d "${SANDBOX_REPO_PATH}" ]]
+    if [[ -d "${SHITBOX_REPO_PATH}" ]]
     then
-        echo -e "Sandbox tags (prepend sandbox-):\n"
+        echo -e "Shitbox tags (prepend shitbox-):\n"
 
-        cd "${SANDBOX_REPO_PATH}" || exit
+        cd "${SHITBOX_REPO_PATH}" || exit
         "${ANSIBLE_PLAYBOOK_BINARY_PATH}" \
-            "${SANDBOX_PLAYBOOK_PATH}" \
+            "${SHITBOX_PLAYBOOK_PATH}" \
             --become \
             --list-tags --skip-tags "always,sanity_check" 2>&1 | grep "TASK TAGS" | cut -d":" -f2 | sed 's/[][]//g' | cut -c2- | sed 's/, /\n/g' | column
 
@@ -393,19 +393,19 @@ shitbox-branch () {
 
 }
 
-sandbox-branch () {
+shitbox-branch () {
 
-    if [[ -d "${SANDBOX_REPO_PATH}" ]]
+    if [[ -d "${SHITBOX_REPO_PATH}" ]]
     then
-        echo -e "Changing Sandbox branch to $1...\n"
+        echo -e "Changing Shitbox branch to $1...\n"
 
-        cd "${SANDBOX_REPO_PATH}" || exit
+        cd "${SHITBOX_REPO_PATH}" || exit
 
-        SANDBOX_BRANCH=$1
+        SHITBOX_BRANCH=$1
 
-        git_fetch_and_reset_sandbox
+        git_fetch_and_reset_shitbox
 
-        run_playbook_sandbox "--tags settings" && echo -e '\n'
+        run_playbook_shitbox "--tags settings" && echo -e '\n'
 
         echo "Branch change and update completed."
     fi
@@ -459,8 +459,7 @@ deploy_ansible_venv () {
 
 list () {
     sb-list
-    sandbox-list
-    shitboxmod-list
+    shitbox-list
 }
 
 update-ansible () {
@@ -531,7 +530,7 @@ cd "${SB_REPO_PATH}" || exit
 
 git fetch
 HEADHASH=$(git rev-parse HEAD)
-UPSTREAMHASH=$(git rev-parse "main@{upstream}")
+UPSTREAMHASH=$(git rev-parse "master@{upstream}")
 
 if [ "$HEADHASH" != "$UPSTREAMHASH" ]
 then
@@ -577,7 +576,7 @@ case "$subcommand" in
         ;;
     update)
         update
-        sandbox-update
+        shitbox-update
         ;;
     install)
         roles=${*}
@@ -586,8 +585,8 @@ case "$subcommand" in
     branch)
         shitbox-branch "${*}"
         ;;
-    sandbox-branch)
-        sandbox-branch "${*}"
+    shitbox-branch)
+        shitbox-branch "${*}"
         ;;
     recreate-venv)
         recreate-venv
