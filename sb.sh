@@ -59,8 +59,6 @@ git_fetch_and_reset () {
     chown -R "${user_name}":"${user_name}" "${SHITBOX_REPO_PATH}"
 }
 
-}
-
 git_fetch_and_reset_sb () {
 
     git fetch --quiet >/dev/null
