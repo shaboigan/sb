@@ -13,7 +13,7 @@
 ################################
 
 VERBOSE=false
-BRANCH='master'
+BRANCH='main'
 SHITBOX_PATH="/srv/git/shitbox"
 SHITBOX_REPO="https://github.com/shaboigan/shitbox.git"
 
