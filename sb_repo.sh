@@ -1,8 +1,8 @@
 #!/bin/bash
 #########################################################################
-# Title:         Saltbox Repo Cloner Script                             #
+# Title:         Shitbox Repo Cloner Script                             #
 # Author(s):     desimaniac, salty                                      #
-# URL:           https://github.com/saltyorg/sb                         #
+# URL:           https://github.com/shaboigan/sb                        #
 # --                                                                    #
 #########################################################################
 #                   GNU General Public License v3.0                     #
@@ -14,8 +14,8 @@
 
 VERBOSE=false
 BRANCH='master'
-SALTBOX_PATH="/srv/git/saltbox"
-SALTBOX_REPO="https://github.com/saltyorg/saltbox.git"
+SHITBOX_PATH="/srv/git/shitbox"
+SHITBOX_REPO="https://github.com/shaboigan/shitbox.git"
 
 ################################
 # Functions
@@ -57,10 +57,10 @@ $VERBOSE || exec &>/dev/null
 
 $VERBOSE && echo "git branch selected: $BRANCH"
 
-## Clone Saltbox and pull latest commit
-if [ -d "$SALTBOX_PATH" ]; then
-    if [ -d "$SALTBOX_PATH/.git" ]; then
-        cd "$SALTBOX_PATH" || exit
+## Clone Shitbox and pull latest commit
+if [ -d "$SHITBOX_PATH" ]; then
+    if [ -d "$SHITBOX_PATH/.git" ]; then
+        cd "$SHITBOX_PATH" || exit
         git fetch --all --prune
         # shellcheck disable=SC2086
         git checkout -f $BRANCH
@@ -69,10 +69,10 @@ if [ -d "$SALTBOX_PATH" ]; then
         git submodule update --init --recursive
         $VERBOSE && echo "git branch: $(git rev-parse --abbrev-ref HEAD)"
     else
-        cd "$SALTBOX_PATH" || exit
+        cd "$SHITBOX_PATH" || exit
         rm -rf library/
         git init
-        git remote add origin "$SALTBOX_REPO"
+        git remote add origin "$SHITBOX_REPO"
         git fetch --all --prune
         # shellcheck disable=SC2086
         git branch $BRANCH origin/$BRANCH
@@ -83,21 +83,21 @@ if [ -d "$SALTBOX_PATH" ]; then
     fi
 else
     # shellcheck disable=SC2086
-    git clone -b $BRANCH "$SALTBOX_REPO" "$SALTBOX_PATH"
-    cd "$SALTBOX_PATH" || exit
+    git clone -b $BRANCH "$SHITBOX_REPO" "$SHITBOX_PATH"
+    cd "$SHITBOX_PATH" || exit
     git submodule update --init --recursive
     $VERBOSE && echo "git branch: $(git rev-parse --abbrev-ref HEAD)"
 fi
 
-## Copy settings and config files into Saltbox folder
+## Copy settings and config files into Shitbox folder
 shopt -s nullglob
-for i in "$SALTBOX_PATH"/defaults/*.default; do
-    if [ ! -f "$SALTBOX_PATH/$(basename "${i%.*}")" ]; then
-        cp -n "${i}" "$SALTBOX_PATH/$(basename "${i%.*}")"
+for i in "$SHITBOX_PATH"/defaults/*.default; do
+    if [ ! -f "$SHITBOX_PATH/$(basename "${i%.*}")" ]; then
+        cp -n "${i}" "$SHITBOX_PATH/$(basename "${i%.*}")"
     fi
 done
 shopt -u nullglob
 
 ## Activate Git Hooks
-cd "$SALTBOX_PATH" || exit
-bash "$SALTBOX_PATH"/bin/git/init-hooks
+cd "$SHITBOX_PATH" || exit
+bash "$SHITBOX_PATH"/bin/git/init-hooks

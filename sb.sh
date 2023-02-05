@@ -1,8 +1,8 @@
 #!/bin/bash
 #########################################################################
-# Title:         Saltbox: SB Script                                     #
+# Title:         Shitbox: SB Script                                     #
 # Author(s):     desimaniac, chazlarson, salty                          #
-# URL:           https://github.com/saltyorg/sb                         #
+# URL:           https://github.com/shaboigan/sb                        #
 # --                                                                    #
 #########################################################################
 #                   GNU General Public License v3.0                     #
@@ -25,7 +25,7 @@ fi
 ################################
 
 source /srv/git/sb/yaml.sh
-create_variables /srv/git/saltbox/accounts.yml
+create_variables /srv/git/shitbox/accounts.yml
 
 ################################
 # Variables
@@ -34,17 +34,9 @@ create_variables /srv/git/saltbox/accounts.yml
 # Ansible
 ANSIBLE_PLAYBOOK_BINARY_PATH="/usr/local/bin/ansible-playbook"
 
-# Saltbox
-SALTBOX_REPO_PATH="/srv/git/saltbox"
-SALTBOX_PLAYBOOK_PATH="$SALTBOX_REPO_PATH/saltbox.yml"
-
-# Sandbox
-SANDBOX_REPO_PATH="/opt/sandbox"
-SANDBOX_PLAYBOOK_PATH="$SANDBOX_REPO_PATH/sandbox.yml"
-
-# Saltbox_mod
-SALTBOXMOD_REPO_PATH="/opt/saltbox_mod"
-SALTBOXMOD_PLAYBOOK_PATH="$SALTBOXMOD_REPO_PATH/saltbox_mod.yml"
+# Shitbox
+SHITBOX_REPO_PATH="/srv/git/shitbox"
+SHITBOX_PLAYBOOK_PATH="$SHITBOX_REPO_PATH/shitbox.yml"
 
 # SB
 SB_REPO_PATH="/srv/git/sb"
@@ -58,32 +50,15 @@ git_fetch_and_reset () {
     git fetch --quiet >/dev/null
     git clean --quiet -df >/dev/null
     git reset --quiet --hard "@{u}" >/dev/null
-    git checkout --quiet "${SALTBOX_BRANCH:-master}" >/dev/null
+    git checkout --quiet "${SHITBOX_BRANCH:-master}" >/dev/null
     git clean --quiet -df >/dev/null
     git reset --quiet --hard "@{u}" >/dev/null
     git submodule update --init --recursive
-    chmod 664 "${SALTBOX_REPO_PATH}/ansible.cfg"
+    chmod 664 "${SHITBOX_REPO_PATH}/ansible.cfg"
     # shellcheck disable=SC2154
-    chown -R "${user_name}":"${user_name}" "${SALTBOX_REPO_PATH}"
+    chown -R "${user_name}":"${user_name}" "${SHITBOX_REPO_PATH}"
 }
 
-git_fetch_and_reset_sandbox () {
-
-    git fetch --quiet >/dev/null
-    git clean --quiet -df >/dev/null
-    git reset --quiet --hard "@{u}" >/dev/null
-    git checkout --quiet "${SANDBOX_BRANCH:-master}" >/dev/null
-    git clean --quiet -df >/dev/null
-    git reset --quiet --hard "@{u}" >/dev/null
-    git submodule update --init --recursive
-
-    if [[ ! -f "${SANDBOX_REPO_PATH}/ansible.cfg" ]]
-    then
-        cp "${SANDBOX_REPO_PATH}/defaults/ansible.cfg.default" "${SANDBOX_REPO_PATH}/ansible.cfg"
-    fi
-
-    chmod 664 "${SANDBOX_REPO_PATH}/ansible.cfg"
-    chown -R "${user_name}":"${user_name}" "${SANDBOX_REPO_PATH}"
 }
 
 git_fetch_and_reset_sb () {
@@ -102,11 +77,11 @@ run_playbook_sb () {
 
     local arguments=$*
 
-    cd "${SALTBOX_REPO_PATH}" || exit
+    cd "${SHITBOX_REPO_PATH}" || exit
 
     # shellcheck disable=SC2086
     "${ANSIBLE_PLAYBOOK_BINARY_PATH}" \
-        "${SALTBOX_PLAYBOOK_PATH}" \
+        "${SHITBOX_PLAYBOOK_PATH}" \
         --become \
         ${arguments}
 
@@ -130,15 +105,15 @@ run_playbook_sandbox () {
 
 }
 
-run_playbook_saltboxmod () {
+run_playbook_shitboxmod () {
 
     local arguments=$*
 
-    cd "${SALTBOXMOD_REPO_PATH}" || exit
+    cd "${SHITBOXMOD_REPO_PATH}" || exit
 
     # shellcheck disable=SC2086
     "${ANSIBLE_PLAYBOOK_BINARY_PATH}" \
-        "${SALTBOXMOD_PLAYBOOK_PATH}" \
+        "${SHITBOXMOD_PLAYBOOK_PATH}" \
         --become \
         ${arguments}
 
@@ -183,10 +158,10 @@ install () {
     local tags=()
     readarray -t tags < <(printf '%s\n' "${tags_tmp[@]}" | awk '!x[$0]++')
 
-    # Build SB/Sandbox/Saltbox-mod tag arrays
+    # Build SB/Sandbox/Shitbox-mod tag arrays
     local tags_sb
     local tags_sandbox
-    local tags_saltboxmod
+    local tags_shitboxmod
 
     for i in "${!tags[@]}"
     do
@@ -194,7 +169,7 @@ install () {
             tags_sandbox="${tags_sandbox}${tags_sandbox:+,}${tags[i]##sandbox-}"
 
         elif [[ ${tags[i]} == mod-* ]]; then
-            tags_saltboxmod="${tags_saltboxmod}${tags_saltboxmod:+,}${tags[i]##mod-}"
+            tags_shitboxmod="${tags_shitboxmod}${tags_shitboxmod:+,}${tags[i]##mod-}"
 
         else
             tags_sb="${tags_sb}${tags_sb:+,}${tags[i]}"
@@ -202,7 +177,7 @@ install () {
         fi
     done
 
-    # Saltbox Ansible Playbook
+    # Shitbox Ansible Playbook
     if [[ -n "$tags_sb" ]]; then
 
         # Build arguments
@@ -214,7 +189,7 @@ install () {
 
         # Run playbook
         echo ""
-        echo "Running Saltbox Tags: ${tags_sb//,/,  }"
+        echo "Running Shitbox Tags: ${tags_sb//,/,  }"
         echo ""
         run_playbook_sb "$arguments_sb"
         echo ""
@@ -240,22 +215,22 @@ install () {
         echo ""
     fi
 
-    # Saltbox_mod Ansible Playbook
-    if [[ -n "$tags_saltboxmod" ]]; then
+    # Shitbox_mod Ansible Playbook
+    if [[ -n "$tags_shitboxmod" ]]; then
 
         # Build arguments
-        local arguments_saltboxmod="--tags $tags_saltboxmod"
+        local arguments_shitboxmod="--tags $tags_shitboxmod"
 
         if [[ -n "$extra_arg" ]]; then
-            arguments_saltboxmod="${arguments_saltboxmod} ${extra_arg}"
+            arguments_shitboxmod="${arguments_shitboxmod} ${extra_arg}"
         fi
 
         # Run playbook
         echo "========================="
         echo ""
-        echo "Running Saltbox_mod Tags: ${tags_saltboxmod//,/,  }"
+        echo "Running Shitbox_mod Tags: ${tags_shitboxmod//,/,  }"
         echo ""
-        run_playbook_saltboxmod "$arguments_saltboxmod"
+        run_playbook_shitboxmod "$arguments_shitboxmod"
         echo ""
     fi
 
@@ -265,15 +240,15 @@ update () {
 
     deploy_ansible_venv
 
-    if [[ -d "${SALTBOX_REPO_PATH}" ]]
+    if [[ -d "${SHITBOX_REPO_PATH}" ]]
     then
-        echo -e "Updating Saltbox...\n"
+        echo -e "Updating Shitbox...\n"
 
-        cd "${SALTBOX_REPO_PATH}" || exit
+        cd "${SHITBOX_REPO_PATH}" || exit
 
         git_fetch_and_reset
 
-        bash /srv/git/saltbox/scripts/update.sh
+        bash /srv/git/shitbox/scripts/update.sh
 
         local returnValue=$?
 
@@ -282,13 +257,13 @@ update () {
         fi
 
         cp /srv/ansible/venv/bin/ansible* /usr/local/bin/
-        sed -i 's/\/usr\/bin\/python3/\/srv\/ansible\/venv\/bin\/python3/g' /srv/git/saltbox/ansible.cfg
+        sed -i 's/\/usr\/bin\/python3/\/srv\/ansible\/venv\/bin\/python3/g' /srv/git/shitbox/ansible.cfg
 
         run_playbook_sb "--tags settings" && echo -e '\n'
 
         echo -e "Update Completed."
     else
-        echo -e "Saltbox folder not present."
+        echo -e "Shitbox folder not present."
     fi
 
 }
@@ -326,14 +301,14 @@ sb-update () {
 
 sb-list ()  {
 
-    if [[ -d "${SALTBOX_REPO_PATH}" ]]
+    if [[ -d "${SHITBOX_REPO_PATH}" ]]
     then
-        echo -e "Saltbox tags:\n"
+        echo -e "Shitbox tags:\n"
 
-        cd "${SALTBOX_REPO_PATH}" || exit
+        cd "${SHITBOX_REPO_PATH}" || exit
 
         "${ANSIBLE_PLAYBOOK_BINARY_PATH}" \
-            "${SALTBOX_PLAYBOOK_PATH}" \
+            "${SHITBOX_PLAYBOOK_PATH}" \
             --become \
             --list-tags --skip-tags "always" 2>&1 | grep "TASK TAGS" | cut -d":" -f2 | sed 's/[][]//g' | cut -c2- | sed 's/, /\n/g' | column
 
@@ -341,7 +316,7 @@ sb-list ()  {
 
         cd - >/dev/null || exit
     else
-        echo -e "Saltbox folder not present.\n"
+        echo -e "Shitbox folder not present.\n"
     fi
 
 }
@@ -365,15 +340,15 @@ sandbox-list () {
 
 }
 
-saltboxmod-list () {
+shitboxmod-list () {
 
-    if [[ -d "${SALTBOXMOD_REPO_PATH}" ]]
+    if [[ -d "${SHITBOXMOD_REPO_PATH}" ]]
     then
-        echo -e "Saltbox_mod tags (prepend mod-):\n"
+        echo -e "Shitbox_mod tags (prepend mod-):\n"
 
-        cd "${SALTBOXMOD_REPO_PATH}" || exit
+        cd "${SHITBOXMOD_REPO_PATH}" || exit
         "${ANSIBLE_PLAYBOOK_BINARY_PATH}" \
-            "${SALTBOXMOD_PLAYBOOK_PATH}" \
+            "${SHITBOXMOD_PLAYBOOK_PATH}" \
             --become \
             --list-tags --skip-tags "always,sanity_check" 2>&1 | grep "TASK TAGS" | cut -d":" -f2 | sed 's/[][]//g' | cut -c2- | sed 's/, /\n/g' | column
 
@@ -384,21 +359,21 @@ saltboxmod-list () {
 
 }
 
-saltbox-branch () {
+shitbox-branch () {
 
     deploy_ansible_venv
 
-    if [[ -d "${SALTBOX_REPO_PATH}" ]]
+    if [[ -d "${SHITBOX_REPO_PATH}" ]]
     then
-        echo -e "Changing Saltbox branch to $1...\n"
+        echo -e "Changing Shitbox branch to $1...\n"
 
-        cd "${SALTBOX_REPO_PATH}" || exit
+        cd "${SHITBOX_REPO_PATH}" || exit
 
-        SALTBOX_BRANCH=$1
+        SHITBOX_BRANCH=$1
 
         git_fetch_and_reset
 
-        bash /srv/git/saltbox/scripts/update.sh
+        bash /srv/git/shitbox/scripts/update.sh
 
         local returnValue=$?
 
@@ -407,13 +382,13 @@ saltbox-branch () {
         fi
 
         cp /srv/ansible/venv/bin/ansible* /usr/local/bin/
-        sed -i 's/\/usr\/bin\/python3/\/srv\/ansible\/venv\/bin\/python3/g' /srv/git/saltbox/ansible.cfg
+        sed -i 's/\/usr\/bin\/python3/\/srv\/ansible\/venv\/bin\/python3/g' /srv/git/shitbox/ansible.cfg
 
         run_playbook_sb "--tags settings" && echo -e '\n'
 
         echo "Branch change and update completed."
     else
-        echo "Saltbox folder not present."
+        echo "Shitbox folder not present."
     fi
 
 }
@@ -485,11 +460,11 @@ deploy_ansible_venv () {
 list () {
     sb-list
     sandbox-list
-    saltboxmod-list
+    shitboxmod-list
 }
 
 update-ansible () {
-    bash "/srv/git/saltbox/scripts/update.sh"
+    bash "/srv/git/shitbox/scripts/update.sh"
 }
 
 recreate-venv () {
@@ -521,7 +496,7 @@ recreate-venv () {
         python3 -m venv venv
     fi
 
-    bash /srv/git/saltbox/scripts/update.sh
+    bash /srv/git/shitbox/scripts/update.sh
 
     local returnValue=$?
 
@@ -542,8 +517,8 @@ recreate-venv () {
 
 usage () {
     echo "Usage:"
-    echo "    sb update              Update Saltbox."
-    echo "    sb list                List Saltbox tags."
+    echo "    sb update              Update Shitbox."
+    echo "    sb list                List Shitbox tags."
     echo "    sb install <tag>       Install <tag>."
     echo "    sb recreate-venv       Re-create Ansible venv."
 }
@@ -609,7 +584,7 @@ case "$subcommand" in
         install "${roles}"
         ;;
     branch)
-        saltbox-branch "${*}"
+        shitbox-branch "${*}"
         ;;
     sandbox-branch)
         sandbox-branch "${*}"

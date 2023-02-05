@@ -1,7 +1,7 @@
 #!/bin/bash
 #shellcheck disable=SC2220
 #########################################################################
-# Title:         Saltbox Install Script                                 #
+# Title:         Shitbox Install Script                                 #
 # Author(s):     desimaniac, salty                                      #
 # URL:           https://github.com/saltyorg/sb                         #
 # --                                                                    #
@@ -98,7 +98,7 @@ else
     exit 1
 fi
 
-echo "Installing Saltbox Dependencies."
+echo "Installing Shitbox Dependencies."
 
 $VERBOSE || exec &>/dev/null
 
@@ -141,8 +141,8 @@ if [ "$SCRIPT_PATH" != "$SB_INSTALL_SCRIPT" ]; then
     exit $?
 fi
 
-# Install Saltbox Dependencies
+# Install Shitbox Dependencies
 run_cmd bash -H $SB_PATH/sb_dep.sh $VERBOSE_OPT
 
-# Clone Saltbox Repo
+# Clone Shitbox Repo
 run_cmd bash -H $SB_PATH/sb_repo.sh -b master $VERBOSE_OPT
