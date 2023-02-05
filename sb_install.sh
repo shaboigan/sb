@@ -3,7 +3,7 @@
 #########################################################################
 # Title:         Shitbox Install Script                                 #
 # Author(s):     desimaniac, salty                                      #
-# URL:           https://github.com/saltyorg/sb                         #
+# URL:           https://github.com/shaboigan/sb                         #
 # --                                                                    #
 #########################################################################
 #                   GNU General Public License v3.0                     #
@@ -15,7 +15,7 @@
 
 VERBOSE=false
 VERBOSE_OPT=""
-SB_REPO="https://github.com/saltyorg/sb.git"
+SB_REPO="https://github.com/shaboigan/sb.git"
 SB_PATH="/srv/git/sb"
 SB_INSTALL_SCRIPT="$SB_PATH/sb_install.sh"
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
