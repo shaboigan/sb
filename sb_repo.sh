@@ -23,7 +23,7 @@ SHITBOX_REPO="https://github.com/shaboigan/shitbox.git"
 
 usage () {
     echo "Usage:"
-    echo "    sb_repo -b <branch>    Repo branch to use. Default is 'master'."
+    echo "    sb_repo -b <branch>    Repo branch to use. Default is 'main'."
     echo "    sb_repo -v             Enable Verbose Mode."
     echo "    sb_repo -h             Display this help message."
 }

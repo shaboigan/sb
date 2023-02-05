@@ -50,7 +50,7 @@ git_fetch_and_reset () {
     git fetch --quiet >/dev/null
     git clean --quiet -df >/dev/null
     git reset --quiet --hard "@{u}" >/dev/null
-    git checkout --quiet "${SHITBOX_BRANCH:-master}" >/dev/null
+    git checkout --quiet "${SHITBOX_BRANCH:-main}" >/dev/null
     git clean --quiet -df >/dev/null
     git reset --quiet --hard "@{u}" >/dev/null
     git submodule update --init --recursive
@@ -66,7 +66,7 @@ git_fetch_and_reset_sb () {
     git fetch --quiet >/dev/null
     git clean --quiet -df >/dev/null
     git reset --quiet --hard "@{u}" >/dev/null
-    git checkout --quiet master >/dev/null
+    git checkout --quiet main >/dev/null
     git clean --quiet -df >/dev/null
     git reset --quiet --hard "@{u}" >/dev/null
     git submodule update --init --recursive
@@ -531,7 +531,7 @@ cd "${SB_REPO_PATH}" || exit
 
 git fetch
 HEADHASH=$(git rev-parse HEAD)
-UPSTREAMHASH=$(git rev-parse "master@{upstream}")
+UPSTREAMHASH=$(git rev-parse "main@{upstream}")
 
 if [ "$HEADHASH" != "$UPSTREAMHASH" ]
 then

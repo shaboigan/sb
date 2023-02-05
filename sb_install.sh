@@ -49,26 +49,6 @@ done
 # Main
 ################################
 
-# Check if Cloudbox is installed
-# develop
-if [ -d "/srv/git/cloudbox" ]; then
-    echo "==== Cloudbox Install Detected ===="
-    echo "Cloudbox installed. Exiting..."
-    echo "==== Cloudbox Install Detected ===="
-    exit 1
-fi
-
-# master
-for directory in /home/*/*/ ; do
-    base=$(basename "$directory")
-    if [ "$base" == "cloudbox" ]; then
-        echo "==== Cloudbox Install Detected ===="
-        echo "Cloudbox installed. Exiting..."
-        echo "==== Cloudbox Install Detected ===="
-        exit 1
-    fi
-done
-
 # Check for supported Ubuntu Releases
 release=$(lsb_release -cs)
 
@@ -118,7 +98,7 @@ fi
 # Clone SB repo
 run_cmd mkdir -p /srv/git
 run_cmd mkdir -p /srv/ansible
-run_cmd git clone --branch master "${SB_REPO}" "$SB_PATH"
+run_cmd git clone --branch main "${SB_REPO}" "$SB_PATH"
 
 # Set chmod +x on script files
 run_cmd chmod +x $SB_PATH/*.sh
@@ -145,4 +125,4 @@ fi
 run_cmd bash -H $SB_PATH/sb_dep.sh $VERBOSE_OPT
 
 # Clone Shitbox Repo
-run_cmd bash -H $SB_PATH/sb_repo.sh -b master $VERBOSE_OPT
+run_cmd bash -H $SB_PATH/sb_repo.sh -b main $VERBOSE_OPT
